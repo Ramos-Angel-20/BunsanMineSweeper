@@ -1,158 +1,126 @@
-const zeroConvertion = (matrix) => {
+const { createInterface } = require('readline');
+const { createReadStream } = require('fs');
+
+const mineSweeperRows = () => {
+
+    return new Promise((resolve, reject) => {
+
+        const readline = createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+
+        readline.question('Introduzca la cantidad de filas de su matriz (valor numerico): ', (value) => {
+            readline.close();
+            resolve(parseInt(value));
+        });
+    });
+};
+
+const mineSweeperColumns = () => {
+
+    return new Promise((resolve, reject) => {
+
+        const readline = createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+
+        readline.question('Introduzca la cantidad de columnas de su matriz (valor numerico): ', (value) => {
+            readline.close();
+            resolve(parseInt(value));
+        });
+    });
+};
+
+const fillMatrix = (m, n) => {
+
+    // return new Promise((resolve, reject) => {
+
+    //     const matrix = [];
+
+    //     const readline = createInterface({
+    //         input: process.stdin,
+    //         output: process.stdout
+    //     });
+
+    //     for (let i = 0; i < m; i++) {
+
+    //         console.log(`Valores de las columnas de la fila ${i + 1}`);
+    //         const values = [];
+    //         for (let j = 0; j < n; j++) {
+    //             readline.question(`Ingresa un valor "." para espacios vacios y "*" para una mina: `, (option) => {
+    //                 values.push(option);
+    //             });
+
+    //             readline.close();
+    //         }
+    //         matrix.push(values);
+    //     }
+    //     resolve(matrix);
+    // });
+
+    return new Promise((resolve, reject) => {
+
+        const matrix = [];
+
+        const matrixFillment = (m, n) => {
+
+            const readline = createInterface({
+                input: process.stdin,
+                output: process.stdout
+            });
+
+            let countM = 0;
+            let countN = 0;
+
+            const recursiveQuestion = (count) => {
+                const values = [];
+                
+                if (countM === m) {
+                    readline.close();
+                    resolve(values);
+                }
+                
+                readline.question('Ingrese un valor: ',  (option) => {
+                    values.push(parseInt(option));
+                    recursiveQuestion(countM + 1);
+                });
+            }
+
+            
+        }
+
+    });
+};
+
+const readTxtMatrix = () => {
     
-    for (let i = 0; i < matrix.length; i++) {
+    return new Promise((resolve, reject) => {
+        const readedValues = [];
+        
+        const readInterface = createInterface({
+            input: createReadStream('./file2.txt'),
+            output: process.stdout,
+            console: false
+        });
 
-        for (let j = 0; j < matrix[i].length; j++) {
+        readInterface.on('line', function(line) {
+            readedValues.push(line);
+        });
 
-            if (matrix[i][j] === '.') {
-                matrix[i][j] = 0;
-            }
-        }
-    }
+        readedValues.forEach((item, index) => {
+            console.log(item)
+        });
+
+        resolve(readedValues);
+    });
+    
 }
 
-const modifyAroundValues = (matrix, i, j) => {
-
-    // modificar sector de arriba (si este existe)
-    if (i !== 0) { //METIMOS ESTA CONDICION PARA MANEJAR MINAS EN LOS BORDES
-        if (matrix[i - 1][j] !== undefined) {
-
-            // Parte central de arriba 
-            if (matrix[i - 1][j] !== '*') { // Si hacia arriba no hay nada o tenemos otra mina
-                if (isNaN(matrix[i - 1][j])) {
-                    matrix[i - 1][j] = '0';
-                    matrix[i - 1][j] = parseInt(matrix[i - 1][j]);
-                    matrix[i - 1][j] = 1;
-                } else {
-                    matrix[i - 1][j] += 1;
-                }
-            }
-
-            // Parte izquierda de arriba
-            if (matrix[i - 1][j - 1] !== undefined && matrix[i - 1][j - 1] !== '*') {
-                if (isNaN(matrix[i - 1][j - 1])) {
-                    matrix[i - 1][j - 1] = '0';
-                    matrix[i - 1][j - 1] = parseInt(matrix[i - 1][j - 1]);
-                    matrix[i - 1][j - 1] = 1;
-                } else {
-                    matrix[i - 1][j - 1] += 1;
-                }
-            }
-
-            // Parte derecha de arriba 
-            if (matrix[i - 1][j + 1] !== undefined && matrix[i - 1][j + 1] !== '*') {
-                if (isNaN(matrix[i - 1][j + 1])) {
-                    matrix[i - 1][j + 1] = '0';
-                    matrix[i - 1][j + 1] = parseInt(matrix[i - 1][j + 1]);
-                    matrix[i - 1][j + 1] = 1;
-                } else {
-                    matrix[i - 1][j + 1] += 1;
-                }
-            }
-        }
-    }
-
-
-    // Parte derecha central
-    if (matrix[i][j + 1] !== '*' && matrix[i][j + 1] !== undefined) {
-        if (isNaN(matrix[i][j + 1])) {
-            matrix[i][j + 1] = '0';
-            matrix[i][j + 1] = parseInt(matrix[i][j + 1]);
-            matrix[i][j + 1] = 1;
-        } else {
-            matrix[i][j + 1] += 1;
-        }
-    }
-
-    //Parte izquierda central
-    if (matrix[i][j - 1] !== '*' && matrix[i][j - 1] !== undefined) {
-        if (isNaN(matrix[i][j - 1])) {
-            matrix[i][j - 1] = '0';
-            matrix[i][j - 1] = parseInt(matrix[i][j - 1]);
-            matrix[i][j - 1] = 1;
-        } else {
-            matrix[i][j - 1] += 1;
-        }
-    }
-
-    // Sección de abajo
-    if (matrix[i + 1]) { // Metemos esta condicion para manejar minas en los bordes (para que no se desborden)
-
-
-        if (matrix[i + 1][j] !== undefined) {
-
-            // seccion central de abajo
-            if (matrix[i + 1][j] !== '*') {
-                if (isNaN(matrix[i + 1][j])) {
-                    matrix[i + 1][j] = '0';
-                    matrix[i + 1][j] = parseInt(matrix[i + 1][j]);
-                    matrix[i + 1][j] = 1;
-                } else {
-                    matrix[i + 1][j] += 1;
-                }
-            }
-
-            // seccion izquierda de abajo 
-            if (matrix[i + 1][j - 1] !== undefined && matrix[i + 1][j - 1] !== '*') {
-                if (isNaN(matrix[i + 1][j - 1])) {
-                    matrix[i + 1][j - 1] = '0';
-                    matrix[i + 1][j - 1] = parseInt(matrix[i + 1][j - 1]);
-                    matrix[i + 1][j - 1] = 1;
-                } else {
-                    matrix[i + 1][j - 1] += 1;
-                }
-            }
-
-            //seccion derecha de abajo
-            if (matrix[i + 1][j + 1] !== undefined && matrix[i + 1][j + 1] !== '*') {
-                if (isNaN(matrix[i + 1][j + 1])) {
-                    matrix[i + 1][j + 1] = '0';
-                    matrix[i + 1][j + 1] = parseInt(matrix[i + 1][j + 1]);
-                    matrix[i + 1][j + 1] = 1;
-                } else {
-                    matrix[i + 1][j + 1] += 1;
-                }
-            }
-        }
-    }
-
-    zeroConvertion(matrix);
-}
-
-const mineSweeper = (matrix) => {
-
-    // i = profundidad
-    // j = ancho
-
-    for (let i = 0; i < matrix.length; i++) {
-
-        for (let j = 0; j < matrix[i].length; j++) {
-
-            if (matrix[i][j] === '*') {
-                modifyAroundValues(matrix, i, j);
-            }
-        }
-    }
-}
-
-const matrix = [
-    ['*', '*', '*', '*', '*'],
-    ['*', '.', '.', '.', '*'],
-    ['*', '.', '.', '.', '*'],
-    ['*', '.', '.', '.', '*'],
-    ['*', '*', '*', '*', '*']
-];
-
-console.log(matrix);
-mineSweeper(matrix);
-console.log(matrix);
-
-const matrix2 = [
-    ['*', '.', '.', '.'],
-    ['.', '.', '.', '.'],
-    ['.', '*', '.', '.'],
-    ['.', '.', '.', '.']
-];
-console.log(matrix2);
-mineSweeper(matrix2);
-console.log(matrix2);
+module.exports = {
+    mineSweeperRows,
+    mineSweeperColumns,
+    fillMatrix,
+    readTxtMatrix
+};
